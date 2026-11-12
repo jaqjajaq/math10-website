@@ -1,14 +1,18 @@
 import { Suspense } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { OrbitControls, Loader } from '@react-three/drei'
 import { ObjectLoader } from 'three'
 
-const MODEL_URL = 'public/cafewtf.gltf.json'
+const MODEL_URL = '/cafewtf.gltf.json'
 
 function Model() {
     // three.js editor "Export JSON" uses the Object/Scene JSON format -> ObjectLoader
     const object = useLoader(ObjectLoader, MODEL_URL)
     return <primitive object={object} />
+}
+
+function Fallback() {
+    return <p>Hello Just Wait :)</p>
 }
 
 export default function App() {
@@ -20,8 +24,10 @@ export default function App() {
                 <Suspense fallback={null}>
                     <Model />
                 </Suspense>
+
                 <OrbitControls makeDefault />
             </Canvas>
+            <Loader />
         </div>
     )
 }
