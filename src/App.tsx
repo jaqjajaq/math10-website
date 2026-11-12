@@ -11,10 +11,6 @@ function Model() {
     return <primitive object={object} />
 }
 
-function Fallback() {
-    return <p>Hello Just Wait :)</p>
-}
-
 export default function App() {
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
