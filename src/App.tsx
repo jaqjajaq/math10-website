@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { OrbitControls, Loader } from '@react-three/drei'
 import { ObjectLoader } from 'three'
 
 const MODEL_URL = '/cafewtf.gltf.json'
@@ -20,8 +20,10 @@ export default function App() {
                 <Suspense fallback={null}>
                     <Model />
                 </Suspense>
+
                 <OrbitControls makeDefault />
             </Canvas>
+            <Loader />
         </div>
     )
 }
