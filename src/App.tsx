@@ -3,7 +3,7 @@ import { Canvas, useLoader } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { ObjectLoader } from 'three'
 
-const MODEL_URL = 'public/cafewtf.gltf.json'
+const MODEL_URL = '/cafewtf.gltf.json'
 
 function Model() {
     // three.js editor "Export JSON" uses the Object/Scene JSON format -> ObjectLoader
