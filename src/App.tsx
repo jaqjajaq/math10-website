@@ -3,7 +3,9 @@ import { Canvas, useLoader } from '@react-three/fiber'
 import { OrbitControls, Loader } from '@react-three/drei'
 import { ObjectLoader } from 'three'
 
+
 const MODEL_URL = '/cafewtf.gltf.json'
+
 
 function Model() {
     // three.js editor "Export JSON" uses the Object/Scene JSON format -> ObjectLoader
@@ -23,7 +25,15 @@ export default function App() {
 
                 <OrbitControls makeDefault />
             </Canvas>
-            <Loader />
+            <Loader
+                containerStyles={{ background: '#000000',}}
+                innerStyles={{ width: 500, background: '#222' }}   
+                barStyles={{ height: 6, background: '#CC338B' }}          
+                dataStyles={{ fontSize: '24px', color: '#fff', fontFamily: 'Segoe UI', fontWeight: 700 }}
+                dataInterpolation={(p) => `Searching for the food ${p.toFixed(0)}%`} 
+                initialState={(active) => active}            
+
+             />
         </div>
     )
 }
