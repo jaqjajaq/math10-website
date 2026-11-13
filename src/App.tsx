@@ -2,13 +2,11 @@ import { Suspense, useMemo } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
 import { Environment, Sky, OrbitControls, Loader } from '@react-three/drei'
 import * as THREE from 'three'
-import { OrbitControls, Loader } from '@react-three/drei'
-import { ObjectLoader } from 'three'
 
 
 const SUN_POSITION: [number, number, number] = [100, 50, 100] // NEW: shared by Sky + light
 const MODEL_URL = '/cafe_tf_new_latest_2.glb.json'
-const MODEL_URL = '/cafewtf.gltf.json'
+
 
 
 function Model() {
