@@ -3,7 +3,7 @@ import { Canvas, useLoader } from '@react-three/fiber'
 import { OrbitControls, Loader } from '@react-three/drei'
 import { ObjectLoader } from 'three'
 
-const MODEL_URL = '/cafewtf.gltf.json'
+const MODEL_URL = '/cafe_tf_new_latest_2.glb.json'
 
 function Model() {
     // three.js editor "Export JSON" uses the Object/Scene JSON format -> ObjectLoader
@@ -20,7 +20,6 @@ export default function App() {
                 <Suspense fallback={null}>
                     <Model />
                 </Suspense>
-
                 <OrbitControls makeDefault />
             </Canvas>
             <Loader />
