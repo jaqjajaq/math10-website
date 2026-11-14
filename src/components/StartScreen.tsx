@@ -24,7 +24,7 @@ const StartScreen = ({ onStart }: Props) =>
 
             <button
                 onClick={onStart}
-                className="cursor-pointer rounded-full bg-[#CC338B] px-10 py-3 font-['Segoe_UI',sans-serif] text-xl font-bold text-[#F8F8F8] transition hover:scale-105 hover:brightness-120"
+                className="cursor-pointer rounded-full bg-[#CC338B] px-10 py-3 font-['Segoe_UI',sans-serif] text-xl font-bold text-[#F8F8F8] transition hover:scale-105 active:brightness-150"
             >
                 Enter
             </button>
