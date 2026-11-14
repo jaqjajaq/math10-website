@@ -2,7 +2,6 @@ import { Suspense, useMemo } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
 import { Environment, Sky, OrbitControls, Loader } from '@react-three/drei'
 import * as THREE from 'three'
-import LoadingScreen from './components/LoadingScreen'
 
 
 const SUN_POSITION: [number, number, number] = [100, 50, 100] // NEW: shared by Sky + light
@@ -84,11 +83,11 @@ export default function App() {
                                maxPolarAngle={Math.PI / 2}
                 />
             </Canvas>
-            <LoadingScreen />
+            <Loader />
             <div>
 
             </div>
-            {/* <Loader
+            <Loader
                 containerStyles={{ background: '#000000',}}
                 innerStyles={{ width: 500, background: '#222' }}   
                 barStyles={{ height: 6, background: '#CC338B' }}          
@@ -96,7 +95,7 @@ export default function App() {
                 dataInterpolation={(p) => `Searching for the food ${p.toFixed(0)}%`} 
                 initialState={(active) => active}            
 
-             /> */}
+             />
         </div>
     )
 }
