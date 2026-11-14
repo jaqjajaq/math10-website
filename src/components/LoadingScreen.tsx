@@ -20,6 +20,7 @@ const LoadingScreen = ({ ready, visible, onDone }: Props) => {
                 visible ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
         >
+            <img src="/WTF.svg" alt="Cafe wtf logo" className="h-30 w-30"/>
             <div className="h-1.5 w-[500px] max-w-[80vw] bg-[#222]">
                 <div
                     className="h-full bg-[#CC338B] transition-[width] duration-300 ease-out"
