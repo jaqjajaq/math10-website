@@ -1,7 +1,9 @@
-import { Suspense, useMemo } from 'react'
+import { Suspense, useMemo, useEffect, useState, useCallback } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
-import { Environment, Sky, OrbitControls, Loader } from '@react-three/drei'
+import { Environment, Sky, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
+import LoadingScreen from './components/LoadingScreen'
+import StartScreen from './components/StartScreen'
 
 
 const SUN_POSITION: [number, number, number] = [100, 50, 100] // NEW: shared by Sky + light
@@ -9,7 +11,7 @@ const MODEL_URL = '/cafe_tf_new_latest_2.glb.json'
 
 
 
-function Model() {
+function Model({ onReady }: { onReady: () => void }) {
     // three.js editor "Export JSON" uses the Object/Scene JSON format -> ObjectLoader
     const object = useLoader(THREE.ObjectLoader, MODEL_URL)
 
@@ -36,11 +38,18 @@ function Model() {
         lightsToRemove.forEach((l) => l.removeFromParent())
     }, [object])
 
+    useEffect(() => {
+        onReady()
+    }, [onReady])
     return <primitive object={object} />
 }
 
 
 export default function App() {
+    const [phase, setPhase] = useState<'start' | 'loading' | 'playing'>('start')
+    const [modelReady, setModelReady] = useState(false)
+    const handleReady = useCallback(() => setModelReady(true), [])
+    const handleDone = useCallback(() => setPhase('playing'), [])
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
             <Canvas shadows camera={
@@ -50,7 +59,8 @@ export default function App() {
                 }
             }>
                 <Suspense fallback={null}>
-                    <Model />
+                    {phase !== 'start' && <Model onReady={handleReady} />}
+                    <Environment files="/venice_sunset_1k.hdr" />
                 </Suspense>
 
                 {/* CHANGED: ambient -> hemisphere (sky color on top, ground color below) */}
@@ -72,8 +82,8 @@ export default function App() {
                     shadow-bias={-0.0005}
                 />
 
-                {/* NEW: soft bounce light + reflections (doesn't replace the Sky background) */}
-                <Environment preset="sunset" />
+                {/* <Environment preset="sunset" /> */}
+                <Environment preset="sunset" /> 
 
                 <Sky distance={450000} sunPosition={[100, 50, 100]} turbidity={8} rayleigh={2} />
                 <OrbitControls makeDefault
@@ -83,19 +93,14 @@ export default function App() {
                                maxPolarAngle={Math.PI / 2}
                 />
             </Canvas>
-            <Loader />
-            <div>
-
-            </div>
-            <Loader
-                containerStyles={{ background: '#000000',}}
-                innerStyles={{ width: 500, background: '#222' }}   
-                barStyles={{ height: 6, background: '#CC338B' }}          
-                dataStyles={{ fontSize: '24px', color: '#fff', fontFamily: 'Segoe UI', fontWeight: 700 }}
-                dataInterpolation={(p) => `Searching for the food ${p.toFixed(0)}%`} 
-                initialState={(active) => active}            
-
-             />
+            {phase !== 'playing' && <StartScreen onStart={() => setPhase('loading')} />}
+            {phase !== 'start' && (
+                <LoadingScreen
+                    ready={modelReady}
+                    visible={phase === 'loading'}
+                    onDone={handleDone}
+                />
+            )}
         </div>
     )
 }
