@@ -3,8 +3,11 @@ import { Canvas, useLoader } from '@react-three/fiber'
 import { Environment, Sky, OrbitControls, Loader } from '@react-three/drei'
 import * as THREE from 'three'
 
+
 const SUN_POSITION: [number, number, number] = [100, 50, 100] // NEW: shared by Sky + light
 const MODEL_URL = '/cafe_tf_new_latest_2.glb.json'
+
+
 
 function Model() {
     // three.js editor "Export JSON" uses the Object/Scene JSON format -> ObjectLoader
@@ -84,6 +87,15 @@ export default function App() {
             <div>
 
             </div>
+            <Loader
+                containerStyles={{ background: '#000000',}}
+                innerStyles={{ width: 500, background: '#222' }}   
+                barStyles={{ height: 6, background: '#CC338B' }}          
+                dataStyles={{ fontSize: '24px', color: '#fff', fontFamily: 'Segoe UI', fontWeight: 700 }}
+                dataInterpolation={(p) => `Searching for the food ${p.toFixed(0)}%`} 
+                initialState={(active) => active}            
+
+             />
         </div>
     )
 }
