@@ -8,18 +8,21 @@ const LoadingScreen = ({ ready, visible, onDone }: Props) => {
     const shown = ready ? 100 : Math.min(progress, 99)
 
     useEffect(() => {
-        if (ready) onDone()
-    }, [ready, onDone])
+        if (!ready || !visible) return
+
+        const t = setTimeout(onDone, 300)
+        return () => clearTimeout(t)
+    }, [ready, visible, onDone])
 
     return (
         <div
-            className={`fixed inset-0 z-[1000] flex animate-fade-in flex-col items-center justify-center gap-4 bg-black transition-opacity duration-700 ease-out ${
+            className={`fixed inset-0 z-[1000] flex flex-col items-center justify-center gap-4 bg-black transition-opacity duration-200 ease-out ${
                 visible ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
         >
             <div className="h-1.5 w-[500px] max-w-[80vw] bg-[#222]">
                 <div
-                    className="h-full bg-[#CC338B] transition-[width] duration-200 ease-out"
+                    className="h-full bg-[#CC338B] transition-[width] duration-300 ease-out"
                     style={{ width: `${shown}%` }}
                 />
             </div>
