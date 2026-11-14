@@ -12,7 +12,7 @@ const MODEL_URL = '/exportedwtfcafenew.glb'
 
 
 function Model({ onReady }: { onReady: () => void }) {
-    const { scene } = useGLTF(MODEL_URL, false) // false = don't use Draco (see note)
+    const { scene } = useGLTF(MODEL_URL, false)
 
     useMemo(() => {
         const lightsToRemove: THREE.Object3D[] = []
@@ -73,7 +73,6 @@ export default function App() {
                     shadow-bias={-0.0005}
                 />
 
-                {/* <Environment preset="sunset" /> */}
                 <Environment preset="sunset" /> 
 
                 <Sky distance={450000} sunPosition={[100, 50, 100]} turbidity={8} rayleigh={2} />
