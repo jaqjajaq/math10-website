@@ -1,47 +1,38 @@
 import { Suspense, useMemo, useEffect, useState, useCallback } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
-import { Environment, Sky, OrbitControls } from '@react-three/drei'
+import { Environment, Sky, OrbitControls, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import LoadingScreen from './components/LoadingScreen'
 import StartScreen from './components/StartScreen'
 
 
 const SUN_POSITION: [number, number, number] = [100, 50, 100] // NEW: shared by Sky + light
-const MODEL_URL = '/cafe_tf_new_latest_2.glb.json'
+const MODEL_URL = '/exportedwtfcafenew.glb'
 
 
 
 function Model({ onReady }: { onReady: () => void }) {
-    // three.js editor "Export JSON" uses the Object/Scene JSON format -> ObjectLoader
-    const object = useLoader(THREE.ObjectLoader, MODEL_URL)
+    const { scene } = useGLTF(MODEL_URL, false) // false = don't use Draco (see note)
 
     useMemo(() => {
         const lightsToRemove: THREE.Object3D[] = []
 
-        object.traverse((obj) => {
+        scene.traverse((obj) => {
             if (obj instanceof THREE.Mesh) {
                 obj.castShadow = true
                 obj.receiveShadow = true
-
-                const swap = (m: THREE.Material) =>
-                    m instanceof THREE.MeshBasicMaterial
-                        ? new THREE.MeshStandardMaterial({ color: m.color, map: m.map })
-                        : m
-
-                obj.material = Array.isArray(obj.material)
-                    ? obj.material.map(swap)
-                    : swap(obj.material)
             }
             if (obj instanceof THREE.Light) lightsToRemove.push(obj)
         })
 
         lightsToRemove.forEach((l) => l.removeFromParent())
-    }, [object])
+    }, [scene])
 
     useEffect(() => {
         onReady()
     }, [onReady])
-    return <primitive object={object} />
+
+    return <primitive object={scene} />
 }
 
 
@@ -105,4 +96,4 @@ export default function App() {
     )
 }
 
-useLoader.preload(THREE.ObjectLoader, MODEL_URL)
+useGLTF.preload(MODEL_URL)
