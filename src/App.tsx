@@ -1,19 +1,28 @@
-import { Suspense, useMemo, useEffect, useState, useCallback } from 'react'
-import { Canvas } from '@react-three/fiber'
-import { OrbitControls, useGLTF } from '@react-three/drei'
+import { Suspense, useState, useLayoutEffect, useMemo } from 'react'
+import { Canvas, useThree } from '@react-three/fiber'
+import { OrbitControls, Gltf, useGLTF } from '@react-three/drei'
+import { EffectComposer, Bloom, ToneMapping } from '@react-three/postprocessing'
+
 import * as THREE from 'three'
 
 import Surroundings from './components/Surroundings.tsx'
-import LoadingScreen from './components/LoadingScreen'
+import LoadingScreen from "./components/LoadingScreen.tsx"
 import StartScreen from './components/StartScreen'
 
 const MODEL_URL = '/scene.glb'
 
-// Replaces <Gltf castShadow receiveShadow /> so we can tell the loading screen when it's ready
-function Model({ onReady }: { onReady: () => void }) {
-    const { scene } = useGLTF(MODEL_URL)
+function Model() {
+    const { scene, nodes } = useGLTF(MODEL_URL)
 
-    useMemo(() => {
+    const signCenter = useMemo(() => {
+        scene.updateMatrixWorld(true)
+        const sign = scene.getObjectByName('Neon_Light') // ← your sign's name in Blender
+        return sign
+            ? new THREE.Box3().setFromObject(sign).getCenter(new THREE.Vector3())
+            : null
+    }, [scene])
+
+    useLayoutEffect(() => {
         scene.traverse((obj) => {
             if (obj instanceof THREE.Mesh) {
                 obj.castShadow = true
@@ -22,24 +31,29 @@ function Model({ onReady }: { onReady: () => void }) {
         })
     }, [scene])
 
-    useEffect(() => {
-        onReady()
-    }, [onReady])
-
-    return <primitive object={scene} />
+    return <>
+        <primitive object={scene} />
+        {signCenter && (
+            <pointLight
+                position={[signCenter.x, signCenter.y, signCenter.z + 3]} // nudge toward the street
+                color="#ffcc66"
+                intensity={200}
+                distance={30}
+                decay={2}
+            />
+        )}
+    </>
 }
 
 export default function App() {
-    const [phase, setPhase] = useState<'start' | 'loading' | 'playing'>('start')
-    const [modelReady, setModelReady] = useState(false)
-    const handleReady = useCallback(() => setModelReady(true), [])
-    const handleDone = useCallback(() => setPhase('playing'), [])
+    const [started, setStarted] = useState(false)
 
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
             <Canvas shadows camera={{ position: [100, 100, 100], fov: 60 }}>
                 <Suspense fallback={null}>
-                    {phase !== 'start' && <Model onReady={handleReady} />}
+                    { /* <Gltf src={MODEL_URL} castShadow receiveShadow /> */ }
+                    <Model />
                 </Suspense>
 
                 <Surroundings />
@@ -49,19 +63,18 @@ export default function App() {
                     enablePan={false}
                     minDistance={70}
                     maxDistance={150}
-                    maxPolarAngle={Math.PI / 2} // prevent rotating under ground
+                    maxPolarAngle={Math.PI / 2}
                     target={[0, 10, 0]}
                 />
+
+                <EffectComposer>
+                    <Bloom mipmapBlur luminanceThreshold={1} intensity={0.2} />
+                    <ToneMapping />
+                </EffectComposer>
             </Canvas>
 
-            {phase !== 'playing' && <StartScreen onStart={() => setPhase('loading')} />}
-            {phase !== 'start' && (
-                <LoadingScreen
-                    ready={modelReady}
-                    visible={phase === 'loading'}
-                    onDone={handleDone}
-                />
-            )}
+            {!started && <StartScreen onStart={() => setStarted(true)} />}
+            {started && <LoadingScreen />}
         </div>
     )
 }

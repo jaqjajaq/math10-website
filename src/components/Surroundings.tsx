@@ -1,36 +1,24 @@
-import { Environment, Sky, Stars } from '@react-three/drei'
+import { Environment, Stars } from '@react-three/drei'
 
-const SUN_POSITION: [number, number, number] = [0, -100, 0]
+const NIGHT = '#05070f'
 
 export default function Surroundings() {
     return <>
-        <hemisphereLight args={['#ffe2c4', '#444455', 0.5]} />
+        <color attach="background" args={[NIGHT]} />
+        <fog attach="fog" args={[NIGHT, 200, 600]} />   {/* ground fades into the sky instead of a hard horizon line */}
 
-        <directionalLight
-            position={SUN_POSITION}
-            intensity={2.5}
-            color="#ffcf9e"
-            castShadow
+        <hemisphereLight args={['#2a3a5a', '#0a0a10', 0.05]} />
+        <spotLight
+            position={[0, 100, 5]}
+            angle={0.7}          // ~29° half-angle, 0.3 may not cover the whole house
+            penumbra={0.5}
+            intensity={1000}
+            decay={2}
+            color="#ffe4c4"
             shadow-mapSize={[2048, 2048]}
-            shadow-camera-near={1}
-            shadow-camera-far={400}
-            shadow-camera-left={-80}
-            shadow-camera-right={80}
-            shadow-camera-top={80}
-            shadow-camera-bottom={-80}
-            shadow-bias={-0.0005}
         />
+        <Environment preset="night" environmentIntensity={0.1} />
 
-        <Environment preset="night" />
-
-        <Sky distance={450000} sunPosition={SUN_POSITION} turbidity={8} rayleigh={2} />
-        <Stars
-            radius={300}
-            depth={50}
-            count={5000}
-            factor={4}
-            saturation={0}
-            fade
-        />
+        <Stars radius={300} depth={50} count={5000} factor={4} saturation={0} fade />
     </>
 }
