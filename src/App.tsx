@@ -1,49 +1,69 @@
-import { Suspense } from 'react'
+import { Suspense, useMemo, useEffect, useState, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, useGLTF, Gltf } from '@react-three/drei'
+import { OrbitControls, useGLTF } from '@react-three/drei'
+import * as THREE from 'three'
 
-import Surroundings from "./components/Surroundings.tsx"
+import Surroundings from './components/Surroundings.tsx'
 import LoadingScreen from './components/LoadingScreen'
+import StartScreen from './components/StartScreen'
 
 const MODEL_URL = '/scene.glb'
 
+// Replaces <Gltf castShadow receiveShadow /> so we can tell the loading screen when it's ready
+function Model({ onReady }: { onReady: () => void }) {
+    const { scene } = useGLTF(MODEL_URL)
+
+    useMemo(() => {
+        scene.traverse((obj) => {
+            if (obj instanceof THREE.Mesh) {
+                obj.castShadow = true
+                obj.receiveShadow = true
+            }
+        })
+    }, [scene])
+
+    useEffect(() => {
+        onReady()
+    }, [onReady])
+
+    return <primitive object={scene} />
+}
+
 export default function App() {
+    const [phase, setPhase] = useState<'start' | 'loading' | 'playing'>('start')
+    const [modelReady, setModelReady] = useState(false)
+    const handleReady = useCallback(() => setModelReady(true), [])
+    const handleDone = useCallback(() => setPhase('playing'), [])
+
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
-            <Canvas shadows camera={
-                {
-                    position: [100, 100, 100],
-                    fov: 60,
-                }
-            }>
+            <Canvas shadows camera={{ position: [100, 100, 100], fov: 60 }}>
                 <Suspense fallback={null}>
-                    <Gltf src={MODEL_URL} castShadow receiveShadow />
+                    {phase !== 'start' && <Model onReady={handleReady} />}
                 </Suspense>
 
                 <Surroundings />
 
-                <OrbitControls makeDefault
-                               enablePan={false}
-                               minDistance={70}
-                               maxDistance={150}
-                               maxPolarAngle={Math.PI / 2} // prevent rotating under ground
-                               target={[0, 10, 0]}
+                <OrbitControls
+                    makeDefault
+                    enablePan={false}
+                    minDistance={70}
+                    maxDistance={150}
+                    maxPolarAngle={Math.PI / 2} // prevent rotating under ground
+                    target={[0, 10, 0]}
                 />
             </Canvas>
 
-            <LoadingScreen />
-
-            {/* <Loader
-                containerStyles={{ background: '#000000',}}
-                innerStyles={{ width: 500, background: '#222' }}   
-                barStyles={{ height: 6, background: '#CC338B' }}          
-                dataStyles={{ fontSize: '24px', color: '#fff', fontFamily: 'Segoe UI', fontWeight: 700 }}
-                dataInterpolation={(p) => `Searching for the food ${p.toFixed(0)}%`} 
-                initialState={(active) => active}            
-
-             /> */}
+            {phase !== 'playing' && <StartScreen onStart={() => setPhase('loading')} />}
+            {phase !== 'start' && (
+                <LoadingScreen
+                    ready={modelReady}
+                    visible={phase === 'loading'}
+                    onDone={handleDone}
+                />
+            )}
         </div>
     )
 }
 
-useGLTF.preload(MODEL_URL);
+useGLTF.preload(MODEL_URL)
