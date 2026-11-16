@@ -6,6 +6,7 @@ import { EffectComposer, Bloom, ToneMapping } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
 import Surroundings from './components/Surroundings.tsx'
+import Menu from './components/Menu'
 import LoadingScreen from "./components/LoadingScreen.tsx"
 import StartScreen from './components/StartScreen'
 
@@ -46,7 +47,7 @@ function Model() {
 }
 
 export default function App() {
-    const [started, setStarted] = useState(false)
+    //const [started, setStarted] = useState(false)
 
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
@@ -73,8 +74,13 @@ export default function App() {
                 </EffectComposer>
             </Canvas>
 
+            <LoadingScreen />
+            <Menu />
+
+            { /*
             {!started && <StartScreen onStart={() => setStarted(true)} />}
             {started && <LoadingScreen />}
+            */ }
         </div>
     )
 }
